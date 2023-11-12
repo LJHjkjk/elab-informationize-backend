@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+python-dotenv = "*"
+flask-restful = "*"
+flask-oidc = {ref = "refs/pull/144/head", git = "git+https://github.com/puiterwijk/flask-oidc.git"}
+flask-cors = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
+python_full_version = "3.10.12"
