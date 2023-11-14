@@ -16,6 +16,15 @@ class BaseConfig:
     #OVERWRITE_REDIRECT_URI = FRONT_INDEX_URL
     OIDC_ID_TOKEN_COOKIE_TTL=600000
 
+    # flask-mongodbengine
+    MONGODB_SETTINGS={
+        'db':'elab',
+        'host':'localhost',
+        'port':27017,
+        'username':'root',
+        'password':'123123'
+    }
+
 Config={
     'development':BaseConfig,
     'production': BaseConfig,

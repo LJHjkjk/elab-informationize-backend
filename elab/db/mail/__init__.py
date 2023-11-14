@@ -1,0 +1,1 @@
+from elab.extensions import mongodb as db

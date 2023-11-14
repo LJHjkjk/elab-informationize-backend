@@ -9,6 +9,8 @@ python-dotenv = "*"
 flask-restful = "*"
 flask-oidc = {ref = "refs/pull/144/head", git = "git+https://github.com/puiterwijk/flask-oidc.git"}
 flask-cors = "*"
+flask-mongoengine = "*"
+flask-sqlalchemy = "*"
 
 [dev-packages]
 
