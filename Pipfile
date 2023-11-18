@@ -11,6 +11,9 @@ flask-oidc = {ref = "refs/pull/144/head", git = "git+https://github.com/puiterwi
 flask-cors = "*"
 flask-mongoengine = "*"
 flask-sqlalchemy = "*"
+pymysql = "*"
+wtforms = "*"
+flask-wtf = "*"
 
 [dev-packages]
 
