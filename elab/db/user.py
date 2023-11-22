@@ -2,14 +2,16 @@ from db import sqlAlchemy as db
 
 
 
-
 class UserInfo(db.Model):
     __tablename__='user_info'
     id=db.Column(db.Integer,db.ForeignKey('user.name'),primary_key=True)
-    name=db.Colum(db.String)
+    name=db.Column(db.String(30),nullable=False)
+    award_winning_experience=db.Column(db.String)
+    project_experience=db.Column(db.String)
+    position=db.Column(db.String(30),db.ForeignKey('position.name'),nullable=False)
+    department=db.Column(db.Enum())
 
 
-# 
 class User(db.Model):
     __tablename__='user'
     # 所属组织
@@ -24,11 +26,12 @@ class User(db.Model):
     password=db.Column(db.String(100),nullable=False)
     # 显示名称
     displayName=db.Column(db.String(100))
+    email=db.Column(db.String)
+    phone=db.Column(db.String)
+
 
 class UserView(db.Model):
     __tablename__='user_view'
-    # 所属组织
-    owner=db.Column(db.String(100))
     # 个人真实姓名
     name=db.Column(db.String(100))
     # 学号
@@ -39,4 +42,3 @@ class UserView(db.Model):
     password=db.Column(db.String(100))
     # 显示名称
     displayName=db.Column(db.String(100))
-

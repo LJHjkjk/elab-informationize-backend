@@ -9,14 +9,14 @@ from form.mail import SendNotifyMail
 mail_blueprint=Blueprint('mail',__name__)
 
 
-@mail_blueprint.route('/<str:mail_id>',methods=['GET'])
+@mail_blueprint.route('/',methods=['GET'])
 @oidc.require_login
-def get_mail_info(mail_id):
+def get_mail_info():
     # 获取请求者id
     requester_id=oidc.user_getfield('name')
   
     # 找到邮件
-    mail_id=ObjectId(mail_id)
+    mail_id=request.args.get('mail_id')
     mail=MailCenter.object.get(id=mail_id)
 
     if not mail:
@@ -37,7 +37,7 @@ def get_mail_info(mail_id):
 
 @mail_blueprint.route('/',methods=['POST'])
 @oidc.require_login
-def post_mail():
+def send_mail():
     # 获取表单
     mail_type=request.args.get('mail_type')
 
@@ -96,18 +96,33 @@ def get_mailbox():
         'unfinished':None,
         'finished':None
     }
+    # 查询用户
+    user_id=oidc.user_getfield('name')
+    user=UserMailbox.object.get(id=ObjectId(user_id))
+
     # 查询邮件
-    
+    unfinished=[]
+    finished=[]
+    for i in user.unfinished:
+        mail=MailCenter.object.get(ObjectId(i))
+        unfinished.append(mail.return_dict())
 
+    for i in user.finished:
+        mail=MailCenter.object.get(ObjectId(i))
+        finished.append(mail.return_dict())
     # 返回邮件
-    pass
+    mails['unfinished']=unfinished
+    mails['finished']=finished
+
+    return jsonify({
+        'result':'ok',
+        'messgae':mails
+    })
 
 
-@mail_blueprint.route('/sendable-objects/<int:requester_id>',methods=['GET'])
+@mail_blueprint.route('/sendable-objects',methods=['GET'])
 @oidc.require_login
-def get_sendable_objects(requester_id):
-    # 查看是否为本人
-
+def get_sendable_objects():
     # 查询可发送对象
 
     # 返回列表

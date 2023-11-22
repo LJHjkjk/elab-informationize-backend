@@ -1,4 +1,4 @@
-from flask import Blueprint,jsonify
+from flask import Blueprint,jsonify,request
 from elab.extensions import oidc,sqlAlchemy as sql
 
 from db.user import UserInfo,UserView
@@ -8,9 +8,10 @@ from db.user import UserInfo,UserView
 user_blueprint=Blueprint('user',__name__)
 
 
-@user_blueprint.route('/<int:id>',methods=['GET'])
+@user_blueprint.route('',methods=['GET'])
 @oidc.require_login
-def get_user_info(id):
+def get_user_info():
+	id=request.args.get('user_id')
 	# 检测是否为本人
 	if id!=oidc.user_getfield('name'):
 		return jsonify({
@@ -37,9 +38,6 @@ def get_user_info(id):
 				'result':'no',
 				'message':'User not found'
 		}),404
-    
-
-
 
 	
 
@@ -56,4 +54,3 @@ def post_user_info(id):
 def user_init(api_blueprint):
   api_blueprint.register_blueprint(user_blueprint)
 
-    

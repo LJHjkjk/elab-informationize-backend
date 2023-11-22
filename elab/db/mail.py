@@ -15,11 +15,6 @@ class MailCenter(db.Document):
     # 邮件id，由mongodb默认生成
     id = db.ObjectIdField(primary_key=True, default=None)
     title=db.StringField(required=True,max_length=200)
-    # 邮件的类型
-    type=db.StringField(required=True,
-                        choices=['notify','reply','choice','judge'],
-                        default='notify'
-                        )
     # 发送者的名字
     sender_name=db.StringField(required=True,max_length=30,default='系统通知')
     # 发送者的id
@@ -27,7 +22,8 @@ class MailCenter(db.Document):
     pubdate=db.DateTimeField(required=True,default=datetime.datetime.utcnow)
     # 收件人的id列表
     receivers_id=db.ListField(db.IntField(),required=True)
-
+    # 邮件的正文
+    body=db.StringField()
     # 是否携带附件
     is_attachment=db.BooleanField(default=False)
 
@@ -37,11 +33,11 @@ class MailCenter(db.Document):
     # 邮件中心集合
     meta={
         'collection':'mail_center',
-        'allow_inheritance':True,
-        'abstract': True,
+        'allow_inheritance':False,
+        'abstract': False,
         }
     
-    def return_dict(self,is_return_receiver:bool=False):
+    def return_dict(self,is_return_receiver):
         '''
         返回符合可序列化的字典
         '''
@@ -59,6 +55,17 @@ class MailCenter(db.Document):
         if is_return_receiver:
             pass
         return result
+    
+    @classmethod
+    def send_system_mail(cls,title,receivers_id,body):
+        '''
+        发送一个系统邮件
+        '''
+        sys_mail=cls(title=title,receivers_id=receivers_id,body=body)
+        sys_mail.save()
+        
+        
+        
 
 
 class UserMailbox(db.Document):
@@ -77,58 +84,59 @@ class UserMailbox(db.Document):
 
 
 
-class NotifyMail(MailCenter):
-    body=db.StringField(require=True)
+# class NotifyMail(MailCenter):
+#     body=db.StringField(require=True)
 
-    def return_dict(self, is_return_receiver):
-        # 在父类的基础上增加自己的变量进入字典
-        result=super().return_dict(is_return_receiver)
-        result['message']['body']=self.body
-        return result
-
-
-class ReplyMail(MailCenter):
-    body=db.StringField(require=True)
-    reply_object_type=db.StringField(require=True,choices=['mail','apply','null'])
-    reply_object=db.GenericReferenceField()
+#     def return_dict(self, is_return_receiver:bool=False,is_return_body:bool=False):
+#         # 在父类的基础上增加自己的变量进入字典
+#         result=super().return_dict(is_return_receiver)
+#         if is_return_body:
+#             result['message']['body']=self.body
+#         return result
 
 
+# class ReplyMail(MailCenter):
+#     body=db.StringField(require=True)
+#     reply_object_type=db.StringField(require=True,choices=['mail','apply','null'])
+#     reply_object=db.GenericReferenceField()
 
 
 
-class ChoiceMail(MailCenter):
-    body=db.StringField(require=True)
-    is_multiple_choice=db.booleanField(require=True,default=False)
-    options=db.ListField(db.StringField(max_length=20),min_items=2)
-    results=db.ListField(db.StringField(max_length=20))
+
+
+# class ChoiceMail(MailCenter):
+#     body=db.StringField(require=True)
+#     is_multiple_choice=db.booleanField(require=True,default=False)
+#     options=db.ListField(db.StringField(max_length=20),min_items=2)
+#     results=db.ListField(db.StringField(max_length=20))
     
-    def return_dict(self, is_return_receiver: bool = False):
-        result=super().return_dict(is_return_receiver)
-        result['message'['body']]=self.body
-        result['message'['is_multiple_choice']]=self.is_multiple_choice
-        result['message'['options']]=self.options
-        result['message'['results']]=self.results
+#     def return_dict(self, is_return_receiver: bool = False):
+#         result=super().return_dict(is_return_receiver)
+#         result['message'['body']]=self.body
+#         result['message'['is_multiple_choice']]=self.is_multiple_choice
+#         result['message'['options']]=self.options
+#         result['message'['results']]=self.results
 
-        return result
+#         return result
         
 
 
-class JudgeMail(MailCenter):
-    body=db.StringField(require=True)
-    options = db.ListField(
-        db.StringField(), 
-        required=True, 
-        min_items=2, 
-        max_items=2,
-        default=['是','否']
-        )
-    result=db.StringField(choices=options)
+# class JudgeMail(MailCenter):
+#     body=db.StringField(require=True)
+#     options = db.ListField(
+#         db.StringField(), 
+#         required=True, 
+#         min_items=2, 
+#         max_items=2,
+#         default=['是','否']
+#         )
+#     result=db.StringField(choices=options)
 
-    def return_dict(self, is_return_receiver: bool = False):
-        result=super().return_dict(is_return_receiver)
-        result['message'['body']]=self.body
-        result['message'['options']]=self.options
-        result['message'['result']]=self.result
-        return result
+#     def return_dict(self, is_return_receiver: bool = False):
+#         result=super().return_dict(is_return_receiver)
+#         result['message'['body']]=self.body
+#         result['message'['options']]=self.options
+#         result['message'['result']]=self.result
+#         return result
 
 
