@@ -1,4 +1,4 @@
-from db import sqlAlchemy as db
+from elab.db import sqlAlchemy as db
 
 
 class Task(db.Model):

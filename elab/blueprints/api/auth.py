@@ -20,7 +20,11 @@ def validate_login():
 
     if not oidc.user_loggedin:
         return {'result':'no','message':''}    
-    return {'result': 'ok', 'message': 'had logined'}
+    return {
+        'result': 'ok', 
+        'message': 'had logined',
+        'user_id':oidc.user_getfield('name')
+        }
 
 
 

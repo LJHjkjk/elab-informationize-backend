@@ -3,8 +3,8 @@ from bson import ObjectId
 
 
 from elab.extensions import oidc,mongodb as mg
-from db.mail import MailCenter,UserMailbox,NotifyMail
-from form.mail import SendNotifyMail
+from elab.db.mail import MailCenter,UserMailbox
+from elab.form.mail import SendNotifyMail
 
 mail_blueprint=Blueprint('mail',__name__)
 
@@ -144,4 +144,4 @@ def deal_mail():
 
 
 def mail_init(api_blueprint):
-    api_blueprint.register_blueprint(mail_blueprint)
+    api_blueprint.register_blueprint(mail_blueprint,url_prefix='/mail')

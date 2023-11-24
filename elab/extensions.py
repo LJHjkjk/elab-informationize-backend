@@ -11,7 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 oidc = OpenIDConnect()
-cors=CORS(origins=['http://localhost:3000'])
+cors=CORS(origins=['*'],supports_credentials=True)
 mongodb = MongoEngine()
 sqlAlchemy=SQLAlchemy()
 

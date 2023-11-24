@@ -1,4 +1,4 @@
-from db import sqlAlchemy as db
+from elab.db import sqlAlchemy as db
 
 
 # 申请的基类
@@ -43,5 +43,3 @@ class ReimbursementApply(Apply):
     is_upload_invoice=db.Column(db.Boolean)
     invoice=db.Column(db.String(100))
     # 接受发票者
-    
-

@@ -1,14 +1,5 @@
-from db import mongodb as db
+from elab.db import mongodb as db
 import datetime    
-
-
-class UserGroup(db.Document):
-    meta={
-    'collection':'user_group',
-    'allow_inheritance':True,
-    'abstract': True,
-    }
-
 
 
 class MailCenter(db.Document):
@@ -72,8 +63,6 @@ class UserMailbox(db.Document):
     # 用户收件箱集合
     id = db.ObjectIdField(primary_key=True, default=None)
     name=db.StringField(require=True,max_length=30)
-    # 可发送对象的群组的文档
-    sendable_id=db.ListField(db.IntField(),required=True,default=[])
     finished_mailbox=db.ListField(db.ReferenceField(MailCenter),required=True,default=[])
     unfinished_mailbox=db.ListField(db.ReferenceField(MailCenter),required=True,default=[])
     send_history=db.ListField(db.ReferenceField(MailCenter),required=True,default=[])

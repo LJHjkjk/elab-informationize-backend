@@ -8,6 +8,8 @@ class BaseConfig:
     # elab
     FRONT_INDEX_URL='http://localhost:3000'
 
+    #flask-sqlalchemy
+    SQLALCHEMY_DATABASE_URI='mysql+pymysql://root:123123@localhost/casdoor'
 
 
     # flask-oidc

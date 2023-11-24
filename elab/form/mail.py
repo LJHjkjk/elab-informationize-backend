@@ -9,7 +9,7 @@ class SendMailBase(FlaskForm):
 
     receivers_id = FieldList(IntegerField('receiver_id', validators=[validators.NumberRange(min=0)]))
     is_attachment=BooleanField('is_attachment', validators=[validators.DataRequired()])
-    attachment=FileField('attachment',validators=[validators.DataRequired(),validators.FileAllowed()])
+    attachment=FileField('attachment',validators=[validators.DataRequired()])
 
 
 class SendNotifyMail(SendMailBase):
