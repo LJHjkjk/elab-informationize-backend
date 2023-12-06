@@ -7,6 +7,7 @@ class BaseConfig:
 
     # elab
     FRONT_INDEX_URL='http://localhost:3000'
+    SAVE_FILE_ROOT_PATH=''
 
     #flask-sqlalchemy
     SQLALCHEMY_DATABASE_URI='mysql+pymysql://root:123123@localhost/casdoor'

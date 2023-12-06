@@ -9,13 +9,13 @@ api_blueprint=Blueprint('api',__name__)
 from .auth import auth_init
 from .user import user_init
 from .mail import mail_init
-
+from .service import service_init
 
 
 auth_init(api_blueprint)
 user_init(api_blueprint)
 mail_init(api_blueprint)
-
+service_init(api_blueprint)
 
 
 

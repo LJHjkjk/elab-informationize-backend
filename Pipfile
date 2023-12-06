@@ -16,6 +16,7 @@ wtforms = "*"
 flask-wtf = "*"
 sqlalchemy = "*"
 faker = "*"
+flask-uploads = "*"
 
 [dev-packages]
 

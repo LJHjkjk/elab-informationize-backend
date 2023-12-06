@@ -1,131 +1,135 @@
-from elab.db import mongodb as db
-import datetime    
+from elab.db import sqlAlchemy as db
+from datetime import datetime
+import json
+from faker import Faker
 
-
-class MailCenter(db.Document):
-    # 邮件id，由mongodb默认生成
-    id = db.ObjectIdField(primary_key=True, default=None)
-    title=db.StringField(required=True,max_length=200)
-    # 发送者的名字
-    sender_name=db.StringField(required=True,max_length=30,default='系统通知')
-    # 发送者的id
-    sender_id=db.IntField(required=True,default=0)
-    pubdate=db.DateTimeField(required=True,default=datetime.datetime.utcnow)
-    # 收件人的id列表
-    receivers_id=db.ListField(db.IntField(),required=True)
-    # 邮件的正文
-    body=db.StringField()
-    # 是否携带附件
-    is_attachment=db.BooleanField(default=False)
-
-    # 附件的信息，具体需要结合文件系统
-    #attachment_id=db.File()
-
-    # 邮件中心集合
-    meta={
-        'collection':'mail_center',
-        'allow_inheritance':False,
-        'abstract': False,
-        }
+class MailCenter(db.Model):
+    __tablename__='mail_center'
+    # 邮件id
+    id=db.Column(db.Integer,primary_key=True)
+    title=db.Column(db.String(100),nullable=False)
+    sender_id=db.Column(db.String(30),nullable=False,default=0)
+    sender_name=db.Column(db.String(30),nullable=False,default='系统通知')
+    pubdate=db.Column(db.DateTime, default=datetime.now())
+    receivers_id=db.Column(db.JSON,nullable=False)
+    body=db.Column(db.Text)
+    is_attachment = db.Column(db.Boolean, default=False)
     
-    def return_dict(self,is_return_receiver):
+    def return_dict(self,is_receivers=False,is_body=True):
         '''
         返回符合可序列化的字典
         '''
         result= {
-        'result':'ok',
-        'message':{
-            'id':id,
+            'mail_id':self.id,
             'title':self.title,
-            'type':self.type,
             'pubdate':self.pubdate.timestamp(),
             'sender_id':self.sender_id,
             'sender_name':self.sender_name,
-            }
         }
-        if is_return_receiver:
+        if is_receivers:
             pass
+        if is_body:
+            result['body']=self.body
+
         return result
-    
+
+
     @classmethod
-    def send_system_mail(cls,title,receivers_id,body):
+    def send_system_mail(cls,title,receivers_id,body,**kwargs):
         '''
         发送一个系统邮件
         '''
-        sys_mail=cls(title=title,receivers_id=receivers_id,body=body)
-        sys_mail.save()
-        
-        
-        
+        # 创建系统邮件
+        sys_mail=cls(title=title,receivers_id=receivers_id,body=body,*kwargs)
+        db.session.add(sys_mail)
+        db.session.commit()
 
-
-class UserMailbox(db.Document):
-    # 用户收件箱集合
-    id = db.ObjectIdField(primary_key=True, default=None)
-    name=db.StringField(require=True,max_length=30)
-    finished_mailbox=db.ListField(db.ReferenceField(MailCenter),required=True,default=[])
-    unfinished_mailbox=db.ListField(db.ReferenceField(MailCenter),required=True,default=[])
-    send_history=db.ListField(db.ReferenceField(MailCenter),required=True,default=[])
-
-    meta={
-    'collection':'user_mailbox',
-    }
-
-
-
-# class NotifyMail(MailCenter):
-#     body=db.StringField(require=True)
-
-#     def return_dict(self, is_return_receiver:bool=False,is_return_body:bool=False):
-#         # 在父类的基础上增加自己的变量进入字典
-#         result=super().return_dict(is_return_receiver)
-#         if is_return_body:
-#             result['message']['body']=self.body
-#         return result
-
-
-# class ReplyMail(MailCenter):
-#     body=db.StringField(require=True)
-#     reply_object_type=db.StringField(require=True,choices=['mail','apply','null'])
-#     reply_object=db.GenericReferenceField()
-
-
-
-
-
-# class ChoiceMail(MailCenter):
-#     body=db.StringField(require=True)
-#     is_multiple_choice=db.booleanField(require=True,default=False)
-#     options=db.ListField(db.StringField(max_length=20),min_items=2)
-#     results=db.ListField(db.StringField(max_length=20))
+        # 添加到接收者中
+        UserMailbox.add_mail_to_receivers(sys_mail.id,receivers_id)
     
-#     def return_dict(self, is_return_receiver: bool = False):
-#         result=super().return_dict(is_return_receiver)
-#         result['message'['body']]=self.body
-#         result['message'['is_multiple_choice']]=self.is_multiple_choice
-#         result['message'['options']]=self.options
-#         result['message'['results']]=self.results
+    
 
-#         return result
+
+class UserMailbox(db.Model):
+    __tablename__='user_mailbox'
+    id=db.Column(db.String(100),primary_key=True)
+    name=db.Column(db.String(30),nullable=False)
+    finished_mailbox=db.Column(db.JSON,nullable=False,default='[]')
+    unfinished_mailbox=db.Column(db.JSON,nullable=False,default='[]')
+    send_history=db.Column(db.JSON,nullable=False,default='[]')
+
+
+    def send_mail(self,title,body,receivers_id,**kwargs):
+        # 创建邮件
+        new_mail=MailCenter(
+            title=title,
+            body=body,
+            receivers_id=json.dumps(receivers_id),
+            sender_name=self.name,
+            sender_id=self.id,
+            **kwargs
+            )
+        db.session.add(new_mail)
+        db.session.commit()
+        # 将邮件添加到接收者中
+        self.add_mail_to_receivers(new_mail.id,receivers_id)
+        # 将邮件添加到自己的发送历史
+        json_data=json.loads(self.send_history)
+        json_data.append(new_mail.id)
+        self.send_history=json.dumps(json_data)
+        db.session.commit()
+    
+    
+    @classmethod
+    def add_mail_to_receivers(cls,mail_id,receivers_id):
+        for receiver_id in receivers_id:
+            userMailbox=cls.query.get(receiver_id)
+            json_data=json.loads(userMailbox.unfinished_mailbox)
+            json_data.append(mail_id)
+            userMailbox.unfinished_mailbox=json.dumps(json_data)
+            db.session.commit()
         
 
 
-# class JudgeMail(MailCenter):
-#     body=db.StringField(require=True)
-#     options = db.ListField(
-#         db.StringField(), 
-#         required=True, 
-#         min_items=2, 
-#         max_items=2,
-#         default=['是','否']
-#         )
-#     result=db.StringField(choices=options)
 
-#     def return_dict(self, is_return_receiver: bool = False):
-#         result=super().return_dict(is_return_receiver)
-#         result['message'['body']]=self.body
-#         result['message'['options']]=self.options
-#         result['message'['result']]=self.result
-#         return result
+def init_mail():
+    db.metadata.create_all(bind=db.engine, tables=[MailCenter.__table__,UserMailbox.__table__])
 
 
+def drop_mail():
+    # 删除两个表
+    try:
+        db.session.execute(db.text('drop tables if exists user_mailbox,mail_center'))
+        db.session.commit()
+    except Exception as e:
+        print(e)
+
+
+
+
+def forge_mail():
+    # 获取user的信息
+    from .user import UserView
+    users=UserView.query.all()
+
+    # 为每一个user创建一个用户收件箱
+    for user in users:
+        user_mailbox=UserMailbox(
+            id=user.id,
+            name=user.name,
+        )
+        db.session.add(user_mailbox)
+
+    db.session.commit()
+
+    # 创建一些虚拟邮件
+    fake=Faker('zh_CN')
+    users=UserMailbox.query.all()
+    for user in users:
+        user.send_mail(
+            title=fake.sentence(),
+            body=fake.text(),
+            receivers_id=['20221071164'],
+            pubdate=fake.date_time()
+        )
+    

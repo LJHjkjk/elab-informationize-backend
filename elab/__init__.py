@@ -6,7 +6,7 @@ from flask import Flask
 import os
 
 
-from elab.extensions import oidc,cors,mongodb,sqlAlchemy
+from elab.extensions import oidc,cors,sqlAlchemy
 from elab.blueprints import blueprint
 
 from elab.settings import Config
@@ -44,7 +44,6 @@ def register_extensions(app):
     '''
     cors.init_app(app,supports_credentials=True,origins=['*'])
     oidc.init_app(app)
-    mongodb.init_app(app)
     sqlAlchemy.init_app(app)
 
     
