@@ -15,7 +15,7 @@ class File(db.Model):
     # 文件名
     name=db.Column(db.String(200),primary_key=True)
     # 文件类型
-    type=db.Column(db.Enum(FileType),nullable=False)
+    type=db.Column(db.Enum(FileType),primary_key=True,nullable=False)
     # 储存路径
     path=db.Column(db.String(200),nullable=False)
     # 上传时间
@@ -26,6 +26,8 @@ class File(db.Model):
     owner_name=db.Column(db.String(100))
     # 文件描述
     describe=db.Column(db.String(100))
+    # 要访问的url
+    url=db.Column(db.String(100))
 
 
 

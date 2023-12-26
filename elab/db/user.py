@@ -7,6 +7,8 @@ class User(db.Model):
     __tablename__='user'
     # 所属组织
     owner=db.Column(db.String(100),primary_key=True)
+    # 名字
+    display_name=db.Column(db.String(100))
     # 名字唯一标识（使用学号）
     name=db.Column(db.String(100),primary_key=True,nullable=False)
     # 每个人有一个id
@@ -31,9 +33,9 @@ class UserInfo(db.Model):
     # 项目经历
     project_experience=db.Column(db.Text)
     # 职务
-    position=db.Column(db.String(30))
+    position=db.Column(db.String(100))
     # 所在部门
-    department=db.Column(db.Enum('硬件组','极客创新组'),default='硬件组')
+    department=db.Column(db.String(100),default='无')
 
     # 性别
     gender=db.Column(db.Enum('女','男'))
@@ -43,8 +45,8 @@ class UserInfo(db.Model):
     major=db.Column(db.String(100))
     # 班级
     classname=db.Column(db.String(100))
-    # 入学时间
-    time_of_enrollment=db.Column(db.Date)
+    # 入学年份
+    grade=db.Column(db.Integer)
     # 加入时间
     join_date=db.Column(db.Date)
     # 籍贯
@@ -52,6 +54,19 @@ class UserInfo(db.Model):
     # 照片
     photograph=db.Column(db.String(100))
     reason_for_application=db.Column(db.Text)
+
+    
+    # 为用户添加一个职位
+    def add_position(self,position):
+        from .permission import Positon,PositonDutyMap,MemberDutyMap
+        position=Positon.query.get(position)
+        positon_duty_map=PositonDutyMap.query.filter_by(position_name=position).all()
+        member_duty_map=[]
+        for i in positon_duty_map:
+            member_duty_map.append(MemberDutyMap(member_id=self.id,duty=i.duty_name))
+        db.session.add_all(member_duty_map)
+        self.position=position
+        db.session.commit()
 
 
 
@@ -75,9 +90,9 @@ class UserView(db.Model):
     # 项目经历
     project_experience=db.Column(db.Text)
     # 职务
-    position=db.Column(db.String(30))
+    position=db.Column(db.String(30),default='成员')
     # 所在部门
-    department=db.Column(db.Enum('硬件组','极客创新组'),default='硬件组')
+    department=db.Column(db.Enum('硬件组','极创组','无'),default='硬件组')
 
     # 性别
     gender=db.Column(db.Enum('女','男'))
@@ -87,8 +102,8 @@ class UserView(db.Model):
     major=db.Column(db.String(100))
     # 班级
     classname=db.Column(db.String(100))
-    # 入学时间
-    time_of_enrollment=db.Column(db.Date)
+    # 入学年份
+    grade=db.Column(db.Integer)
     # 加入时间
     join_date=db.Column(db.Date)
     # 籍贯
@@ -97,7 +112,6 @@ class UserView(db.Model):
     photograph=db.Column(db.String(100))
     # 申请理由
     reason_for_application=db.Column(db.Text)
-
     def return_to_dict(self):
         result={
             'id':self.id,
@@ -113,13 +127,15 @@ class UserView(db.Model):
             'college':self.college,
             'major':self.major,
             'classname':self.classname,
-            'time_of_enrollment':self.time_of_enrollment.strftime("%Y-%m-%d"),
-            'join_date':self.join_date.strftime("%Y-%m-%d"),
+            'grade':self.grade,
+            'join_date':self.join_date.strftime("%Y-%m-%d")
+                if self.join_date else None,
             'native_place':self.native_place,
             'photograph':self.photograph,
             'reason_for_application':self.reason_for_application,
         }
         return result
+
 
 
 def init_user():
@@ -138,7 +154,7 @@ def init_user():
         user_info.college,
         user_info.major,
         user_info.classname,
-        user_info.time_of_enrollment,
+        user_info.grade,
         user_info.join_date,
         user_info.native_place,
         user_info.department,
@@ -154,6 +170,16 @@ def init_user():
         ;
         '''
         db.session.execute(db.text(create_user_view_sql))
+
+        # 创建admin账户
+        admin_user=UserInfo(
+            name='admin',
+            id='1',
+            position='admin',
+        )
+        db.session.add(admin_user)
+        db.session.commit()
+        
     except Exception as e:
         print(e)
 
@@ -182,6 +208,7 @@ def forge_user():
             id='1',
             email=fake.email(),
             phone=fake.phone_number(),
+            display_name='李佳浩'
         )
         new_user_info=UserInfo(
             name='李佳浩',
@@ -189,6 +216,7 @@ def forge_user():
             position='成员',
             project_experience=fake.text(),
             award_winning_experience=fake.text(),
+            grade=fake.random_int(min=2000, max=2023)
         )
         db.session.add(new_user)
         db.session.add(new_user_info)
@@ -197,6 +225,7 @@ def forge_user():
         # 生成其他的虚拟数据
         
         for i in range(0,20):
+            name=fake.name()
             new_user=User(
                 name=str(fake.ssn(min_age=11, max_age=11)),
                 owner='built-in',
@@ -205,13 +234,16 @@ def forge_user():
                 id=str(i+2),
                 email=fake.email(),
                 phone=fake.phone_number(),
+                display_name=name
             )
             new_user_info=UserInfo(
-                name=fake.name(),
+                name=name,
                 id=new_user.name,
                 position='成员',
                 project_experience=fake.text(),
                 award_winning_experience=fake.text(),
+                grade=fake.random_int(min=2000, max=2023)
+
             )
             db.session.add(new_user)
             db.session.add(new_user_info)

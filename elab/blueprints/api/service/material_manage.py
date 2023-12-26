@@ -2,9 +2,13 @@ from elab.db.material import Material
 from flask import Blueprint,jsonify,request
 from elab.extensions import oidc
 from elab.extensions import sqlAlchemy as db
+from elab.log import logs
+from elab.response import response_data,response_message
+from elab.db.log.material_log import MaterialLog
 
 from datetime import datetime
 import json
+
 material_manage_blueprint=Blueprint('material',__name__)
 
 # 获取物料信息
@@ -30,13 +34,24 @@ def checkin_materials():
     if not material:
         return jsonify({
             'result':'no',
-            'message':'没有这个物料'
+            'message':'没有这个物料',
             }),400
-    
+
     # 添加
     number=int(request.args.get('number'))
+    if number<=0:
+        return response_message('数量非法')
     material.number+=number
     db.session.commit()
+    logs.material.add(
+        operation='入库',
+        operator_name=oidc.user_getfield('displayName'),
+        operator_id=oidc.user_getfield('name'),
+        operation_object_name=material.name,
+        operation_object_id=material.id,
+        new_numebr=material.number,
+        change=number,
+    )
     return jsonify({
         'result':'ok',
         'message':'添加成功',
@@ -57,6 +72,8 @@ def checkout_materials():
             }),400
     # 出库
     number=int(request.args.get('number'))
+    if number<=0:
+        return response_message('数量非法')
     if number>material.number:
         return jsonify({
             'result':'no',
@@ -65,6 +82,16 @@ def checkout_materials():
     
     material.number-=int(number)
     db.session.commit()
+    
+    logs.material.add(
+        operation='出库',
+        operator_name=oidc.user_getfield('displayName'),
+        operator_id=oidc.user_getfield('name'),
+        operation_object_name=material.name,
+        operation_object_id=material.id,
+        new_numebr=material.number,
+        change=number,
+    )
     return jsonify({
         'result':'ok',
         'message':'出库成功',
@@ -183,6 +210,15 @@ def modify_materials():
             'message':e,
         }),400
 
+# 修改物料
+@material_manage_blueprint.route('/logs',methods=['GET'])
+@oidc.require_login
+def get_material_logs():
+    # 验证权限
+    # 返回日志
+    material_logs=MaterialLog.query.all()
+    results=[i.return_to_dict() for i in material_logs]
+    return response_data(results)
 
 def material_manage_init(service_blueprint):
     service_blueprint.register_blueprint(material_manage_blueprint,url_prefix='/material')

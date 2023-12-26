@@ -22,7 +22,7 @@ class MailCenter(db.Model):
         result= {
             'mail_id':self.id,
             'title':self.title,
-            'pubdate':self.pubdate.timestamp(),
+            'pubdate':self.pubdate.timestamp() if self.pubdate else None,
             'sender_id':self.sender_id,
             'sender_name':self.sender_name,
         }
@@ -94,6 +94,20 @@ class UserMailbox(db.Model):
 
 def init_mail():
     db.metadata.create_all(bind=db.engine, tables=[MailCenter.__table__,UserMailbox.__table__])
+    # 获取user的信息
+    from .user import UserView
+    users=UserView.query.all()
+
+    # 为每一个user创建一个用户收件箱
+    for user in users:
+        print(user)
+        user_mailbox=UserMailbox(
+            id=user.id,
+            name=user.name,
+        )
+        db.session.add(user_mailbox)
+        db.session.commit()
+
 
 
 def drop_mail():
@@ -119,9 +133,12 @@ def forge_mail():
             name=user.name,
         )
         db.session.add(user_mailbox)
+        db.session.commit()
 
-    db.session.commit()
 
+    # 获取user的信息
+    from .user import UserView
+    users=UserView.query.all()
     # 创建一些虚拟邮件
     fake=Faker('zh_CN')
     users=UserMailbox.query.all()

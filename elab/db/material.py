@@ -4,16 +4,27 @@ from faker import Faker
 
 class Material(db.Model):
     id=db.Column(db.Integer,primary_key=True)
-    name=db.Column(db.String(100))
+    # 名称
+    name=db.Column(db.String(100),nullable=False,unique=True)
+    # 价格
     price=db.Column(db.Integer)
+    # 目前数量
     number=db.Column(db.Integer)
+    # 安全值
     security_value=db.Column(db.Integer)
+    # 来源
     source=db.Column(db.String(100))
+    # 类型
     type=db.Column(db.String(100))
+    # 条形码
     bar_code=db.Column(db.String(100))
+    # 位置
     position=db.Column(db.String(100))
-    remark=db.Column(db.String(500))
+    # 备注
+    remark=db.Column(db.Text)
+    # 入库日期
     warehousing_date=db.Column(db.String(100))
+    # 状态
     state=db.Column(db.String(100))
 
     def return_to_dict(self):
@@ -48,11 +59,22 @@ def drop_material():
 
 def forge_material():
     fake=Faker('zh_CN')
+
+    def generate_unique_words(count):
+        unique_words = set()
+
+        while len(unique_words) < count:
+            random_word = fake.word()
+            unique_words.add(random_word)
+
+        return list(unique_words)
+    unique_words_list = generate_unique_words(200)
     
+
     # 添加200种物料
     for i in range(0,200):
         material=Material(
-            name=fake.word(),
+            name=unique_words_list[i],
             price=fake.random_int(),
             number=fake.random_int(min=0),
             security_value=0,

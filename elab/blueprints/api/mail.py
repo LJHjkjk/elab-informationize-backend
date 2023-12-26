@@ -45,8 +45,6 @@ def get_mail_info():
         except Exception as e:
             ...
 
-        
-
         return jsonify({
             'result':'ok',
             'data':mail.return_dict(is_body=True)

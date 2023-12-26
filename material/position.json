@@ -1,0 +1,32 @@
+{
+    "admin":{
+        "include":["*"],
+        "describe":"管理员，拥有所有的权限，还包含了在casdoor上修改用户信息的权限",
+        "display_name":"admin"
+    },
+    "teacher":{
+        "include":["View"],
+        "describe":"",
+        "display_name":"老师"
+    },
+    "monitor":{
+        "include":["View","Operation"],
+        "describe":"",
+        "display_name":"班长"
+    },
+
+    "hardware_group_leader":{
+        "include":["View","Operation"],
+        "describe":"",
+        "display_name":"硬件组组长"
+    },
+    "software_group_leader":{
+        "include":["View","Operation"],
+        "describe":"",
+        "display_name":"软件组组长"
+    },
+    "member":{
+        "describe":"",
+        "display_name":"成员"
+    }
+}

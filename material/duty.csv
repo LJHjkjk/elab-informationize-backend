@@ -1,0 +1,2 @@
+name,type,display_name,describe
+ material_manage,Operation,物料管理, 对物料进行管理，包括删除、添加、修改物料，还有查看物料日志

@@ -2,18 +2,18 @@
 创建app,注册变量蓝图等
 '''
 
-from flask import Flask
+from flask import Flask,request,abort
 import os
 
 
-from elab.extensions import oidc,cors,sqlAlchemy
+from elab.extensions import oidc,cors,sqlAlchemy,file_manage
 from elab.blueprints import blueprint
 
 from elab.settings import Config
 from elab.db import init_db,drop_db,forge_db
 import click
-
-
+from flask_uploads import configure_uploads
+from elab.import_data import import_user_info,import_user_position,import_positon_info,import_duty_info
 
 def create_app(config_name=None):
     '''
@@ -33,7 +33,7 @@ def create_app(config_name=None):
     register_extensions(app)
     register_blueprints(app)
     register_commands(app)
-    register_errorhandlers(app)
+    register_requesthandlers(app)
 
     return app
 
@@ -45,6 +45,7 @@ def register_extensions(app):
     cors.init_app(app,supports_credentials=True,origins=['*'])
     oidc.init_app(app)
     sqlAlchemy.init_app(app)
+    file_manage.init_app(app)
 
     
 def register_blueprints(app):
@@ -69,15 +70,55 @@ def register_commands(app):
         init_db()
         click.echo('成功创建')
 
-
+    # 创建真实数据
     @app.cli.command()
     def forge():
         forge_db()
 
+    # 导入数据
+    @app.cli.command('import')
+    @click.option('--type','-t', type=click.Choice(['user','position','duty','user_position','all']))
+    @click.option('--path','-p',default=None)
+    def import_data(type,path):
+        def import_user(path):
+            path=path if path is not None else '../material/user.csv'
+            import_user_info(path)
+            click.echo('用户导入成功')
+        def import_duty(path):
+            path=path if path is not None else '../material/duty.csv'
+            import_duty_info(path)
+            click.echo('职责导入成功')
+        def import_position(path):
+            path=path if path is not None else '../material/position.json'
+            import_positon_info(path)
+            click.echo('职务导入成功')
+        def import_user_postion_default(path):
+            return
+            import_user_position(path)
+            click.echo('用户职务导入成功')
+
+        fun_map={
+            'user':import_user,
+            'duty':import_duty,
+            'position':import_position,
+            'user_position':import_user_postion_default,
+        }
+        if type=='all':
+            for i in fun_map:
+                fun_map[i](path)
+            return
+        fun_map[type](path)
 
 
 
-def register_errorhandlers(app):
-    '''
-    注册全局默认错误处理界面
-    '''
+def register_requesthandlers(app):
+    @app.before_request
+    def before_request():
+        if request.path.startswith('/_uploads'):
+            abort(403, 'Access Forbidden: Paths starting with "/_uploads" are not allowed.')
+
+    @app.before_first_request
+    def before_first_request():
+        file_manage.set_access()
+
+

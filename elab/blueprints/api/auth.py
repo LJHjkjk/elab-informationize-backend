@@ -1,8 +1,8 @@
 from elab.extensions import oidc
 from flask import redirect,current_app,request,g
-from flask import Blueprint
+from flask import Blueprint,make_response
 import json
-
+from elab.response import response_message
 
 
 auth_blueprint=Blueprint('auth',__name__)
@@ -34,9 +34,14 @@ def validate_login():
 def login():
     return redirect(current_app.config['FRONT_INDEX_URL'])
 
+
+@auth_blueprint.route('/logout')
+@oidc.require_login
+def logout():
+    resp=make_response(redirect(current_app.config['FRONT_INDEX_URL']))
+    resp.delete_cookie('oidc_id_token')
+    return resp
+
  
 def auth_init(api_blueprint):
     api_blueprint.register_blueprint(auth_blueprint,url_prefix='/auth')
-
-
-

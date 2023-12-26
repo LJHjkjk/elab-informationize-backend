@@ -16,7 +16,9 @@ wtforms = "*"
 flask-wtf = "*"
 sqlalchemy = "*"
 faker = "*"
-flask-uploads = "*"
+flask-uploads = "==0.2.1"
+pandas = "*"
+openpyxl = "*"
 
 [dev-packages]
 
