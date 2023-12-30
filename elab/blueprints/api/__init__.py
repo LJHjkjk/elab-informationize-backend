@@ -1,5 +1,5 @@
 from flask_restful import Api
-from flask import Blueprint,request,current_app
+from flask import Blueprint,request,current_app,send_from_directory
 from elab.extensions import oidc
 import requests
 
@@ -48,3 +48,9 @@ def sso_login():
 
 	# 登录
     oidc.set_cookie_id_token(token_response['id_token'])
+
+
+@api_blueprint.route('/static/<path:filename>')
+def static(filename):
+    static_dir = current_app.root_path+'/static'
+    return send_from_directory(static_dir, filename)

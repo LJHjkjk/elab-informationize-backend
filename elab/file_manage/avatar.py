@@ -1,10 +1,10 @@
 from .base import FileBase
 from flask_uploads import UploadSet,IMAGES
-from flask import url_for
+from flask import current_app,url_for
 
 class Avatar(FileBase):
     def set_access(self):
-        access=url_for('static',filename='avatars/',_external=True)
+        access='http://'+current_app.config['ELAB_SERVER_NAME']+'/api/static/avatars/'
         access+='{}'
         self.access=access
 

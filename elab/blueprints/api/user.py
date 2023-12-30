@@ -50,8 +50,8 @@ def modify_user_info():
 	# 查询用户
 	id=oidc.user_getfield('name')
 	user_info=UserInfo.query.get(id)
-	user=User.query.filter_by(name=id)
-	if user==None or user_init==None:
+	user=User.query.filter_by(name=id).one()
+	if user==None or user_info==None:
 		return response_json('没有这个用户')
 	
 	# 验证信息

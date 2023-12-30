@@ -1,10 +1,11 @@
 from .base import FileBase
 from flask_uploads import UploadSet,IMAGES
-from flask import url_for
+from flask import url_for,current_app
+
 
 class Photograph(FileBase):
     def set_access(self):
-        access=url_for('root.api.user.get_photograph',filename='',_external=True)
+        access='http://'+current_app.config['ELAB_SERVER_NAME']+'/api/user/photograph/'
         access+='{}'
         self.access=access
 

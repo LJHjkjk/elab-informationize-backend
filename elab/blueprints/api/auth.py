@@ -1,5 +1,5 @@
 from elab.extensions import oidc
-from flask import redirect,current_app,request,g
+from flask import redirect,current_app,request,g,url_for
 from flask import Blueprint,make_response
 import json
 from elab.response import response_message
@@ -13,10 +13,6 @@ def validate_login():
     '''
     验证token是否合法
     '''
-    token=request.cookies.get('oidc_id_token')
-    if not token:
-        return {'result':'no','message':"don't have token"}
-    
 
     if not oidc.user_loggedin:
         return {'result':'no','message':''}    
@@ -25,8 +21,6 @@ def validate_login():
         'message': 'had logined',
         'user_id':oidc.user_getfield('name')
         }
-
-
 
 
 @auth_blueprint.route('/login')

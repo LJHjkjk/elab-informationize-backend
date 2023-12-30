@@ -67,7 +67,7 @@ def import_user_position(path,defalut_position='member'):
     df=open_file(path)
     for _,row in df.iterrows():
         user_info=UserInfo.query.get(row['id'])
-        user_info.add_position(row['positon'])
+        user_info.add_position(row['position'])
     # 添加默认职务
     user_info_list=UserInfo.query.all()
     for i in user_info_list:
