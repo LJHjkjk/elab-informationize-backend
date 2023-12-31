@@ -1,11 +1,11 @@
 from elab.db import sqlAlchemy as db
 from faker import Faker
-
+from datetime import datetime
 
 class Material(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     # 名称
-    name=db.Column(db.String(100),nullable=False,unique=True)
+    name=db.Column(db.String(100),nullable=False)
     # 价格
     price=db.Column(db.Integer)
     # 目前数量
@@ -23,7 +23,7 @@ class Material(db.Model):
     # 备注
     remark=db.Column(db.Text)
     # 入库日期
-    warehousing_date=db.Column(db.String(100))
+    warehousing_date=db.Column(db.String(100),default=datetime.now())
     # 状态
     state=db.Column(db.String(100))
 

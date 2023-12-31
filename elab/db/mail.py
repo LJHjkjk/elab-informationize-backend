@@ -53,7 +53,7 @@ class MailCenter(db.Model):
 class UserMailbox(db.Model):
     __tablename__='user_mailbox'
     id=db.Column(db.String(100),primary_key=True)
-    name=db.Column(db.String(30),nullable=False)
+    name=db.Column(db.String(100),nullable=False)
     finished_mailbox=db.Column(db.JSON,nullable=False,default='[]')
     unfinished_mailbox=db.Column(db.JSON,nullable=False,default='[]')
     send_history=db.Column(db.JSON,nullable=False,default='[]')
@@ -94,19 +94,7 @@ class UserMailbox(db.Model):
 
 def init_mail():
     db.metadata.create_all(bind=db.engine, tables=[MailCenter.__table__,UserMailbox.__table__])
-    # 获取user的信息
-    from .user import UserView
-    users=UserView.query.all()
 
-    # 为每一个user创建一个用户收件箱
-    for user in users:
-        print(user)
-        user_mailbox=UserMailbox(
-            id=user.id,
-            name=user.name,
-        )
-        db.session.add(user_mailbox)
-        db.session.commit()
 
 
 

@@ -13,7 +13,8 @@ from elab.settings import Config
 from elab.db import init_db,drop_db,forge_db
 import click
 from flask_uploads import configure_uploads
-from elab.import_data import import_user_info,import_user_position,import_positon_info,import_duty_info
+from elab.import_data import import_user_info,import_user_position,import_positon_info,import_duty_info,\
+import_material_info_from_directory,import_material_info
 
 def create_app(config_name=None):
     '''
@@ -77,7 +78,9 @@ def register_commands(app):
 
     # 导入数据
     @app.cli.command('import')
-    @click.option('--type','-t', type=click.Choice(['user','position','duty','user_position','all']))
+    @click.option('--type','-t', type=click.Choice(['user','position','duty',
+                                                    'user_position','all','material',
+                                                    'material_directory']))
     @click.option('--path','-p',default=None)
     def import_data(type,path):
         def import_user(path):
@@ -96,16 +99,30 @@ def register_commands(app):
             return
             import_user_position(path)
             click.echo('用户职务导入成功')
+        def import_materail(path):
+            path=path if path is not None else '../material/material.csv'
+            import_material_info(path)
+            click.echo('物料导入成功')
+        def import_materail_from_directory(path):
+            path=path if path is not None else '../material/material/'
+            import_material_info_from_directory(path)
+            click.echo('物料目录导入成功')
+            
 
         fun_map={
             'user':import_user,
             'duty':import_duty,
             'position':import_position,
             'user_position':import_user_postion_default,
+            'material':import_materail,
+            'material_directory':import_materail_from_directory
         }
         if type=='all':
-            for i in fun_map:
-                fun_map[i](path)
+            fun_map['user']()
+            fun_map['duty']()
+            fun_map['position']()
+            fun_map['user_position']()
+            fun_map['material_directory']()
             return
         fun_map[type](path)
 

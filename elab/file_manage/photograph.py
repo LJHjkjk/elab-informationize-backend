@@ -5,7 +5,7 @@ from flask import url_for,current_app
 
 class Photograph(FileBase):
     def set_access(self):
-        access='http://'+current_app.config['ELAB_SERVER_NAME']+'/api/user/photograph/'
+        access='http://'+current_app.config['ROOT_URL']+'/api/user/photograph/'
         access+='{}'
         self.access=access
 

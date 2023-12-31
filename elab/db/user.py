@@ -27,7 +27,7 @@ class UserInfo(db.Model):
     # 用户的id，学号
     id=db.Column(db.String(100),primary_key=True)
     # 用户的名字
-    name=db.Column(db.String(30))
+    name=db.Column(db.String(100))
     # 获奖经历
     award_winning_experience=db.Column(db.Text)
     # 项目经历
@@ -172,9 +172,10 @@ def init_user():
         db.session.execute(db.text(create_user_view_sql))
 
         # 创建admin账户
+        admin=User.query.filter_by(name='admin').one()
         admin_user=UserInfo(
-            name='admin',
-            id='1',
+            name=admin.id,
+            id=admin.name,
             position='admin',
         )
         db.session.add(admin_user)

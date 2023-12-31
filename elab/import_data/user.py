@@ -26,6 +26,9 @@ def import_user_info(path):
         db.session.add(new_user_info)
 
     db.session.commit()
+    
+
+
     # 创建邮箱
 
     from elab.db.user import UserView

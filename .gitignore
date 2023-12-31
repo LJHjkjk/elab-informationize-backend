@@ -1,3 +1,4 @@
 fronten
 .env
 Pipfile.lock
+oidc_client_secrets.json
