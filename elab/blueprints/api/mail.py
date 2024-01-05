@@ -163,6 +163,7 @@ def get_sendable_objects():
                 'name':user.name,
                 'avatar':user.avatar,
                 'department':user.department,
+                'grade':user.grade
             })
     return jsonify(result)
 

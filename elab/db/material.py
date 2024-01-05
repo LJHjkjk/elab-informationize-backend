@@ -23,7 +23,7 @@ class Material(db.Model):
     # 备注
     remark=db.Column(db.Text)
     # 入库日期
-    warehousing_date=db.Column(db.String(100),default=datetime.now())
+    warehousing_date=db.Column(db.Date,default=datetime.now())
     # 状态
     state=db.Column(db.String(100))
 
@@ -39,7 +39,7 @@ class Material(db.Model):
             'bar_code':self.bar_code,
             'position':self.position,
             'remark':self.remark,
-            'warehousing_date':self.warehousing_date,
+            'warehousing_date':self.warehousing_date.strftime("%Y-%m-%d"),
             'state':self.state,
         }
         return result

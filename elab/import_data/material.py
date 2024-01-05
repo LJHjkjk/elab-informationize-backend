@@ -5,19 +5,17 @@ import os
 def import_material_info(path):
     df=open_file(path)
     new_materials=[]
+    df.fillna('', inplace=True)
     # 添加物料
     for index,row in df.iterrows():
-        if row['名称（不认识的用淘宝识图）'] is None and row['PLACE'] is None:
-            break
-        if row['名称（不认识的用淘宝识图）'] is None:
+        if row['name']=='':
             continue
-        print(row)
         new_material=Material(
-            name=row['名称（不认识的用淘宝识图）'],
+            name=row['name'],
             source='现有',
-            type=row[' 名称/储物类别'],
-            position=row['PLACE'],
-            remark=row['备注(自行添加)']
+            type=row['type'],
+            position=row['place'],
+            remark=row['remark']
         )
         new_materials.append(new_material)
     db.session.add_all(new_materials)

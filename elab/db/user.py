@@ -217,7 +217,8 @@ def forge_user():
             position='成员',
             project_experience=fake.text(),
             award_winning_experience=fake.text(),
-            grade=fake.random_int(min=2000, max=2023)
+            grade=fake.random_int(min=2018, max=2023),
+            department='极创组'
         )
         db.session.add(new_user)
         db.session.add(new_user_info)
@@ -225,7 +226,7 @@ def forge_user():
 
         # 生成其他的虚拟数据
         
-        for i in range(0,20):
+        for i in range(0,100):
             name=fake.name()
             new_user=User(
                 name=str(fake.ssn(min_age=11, max_age=11)),
@@ -243,8 +244,8 @@ def forge_user():
                 position='成员',
                 project_experience=fake.text(),
                 award_winning_experience=fake.text(),
-                grade=fake.random_int(min=2000, max=2023)
-
+                grade=fake.random_int(min=2018, max=2023),
+                department= fake.random_element(['极创组','无','硬件组'])
             )
             db.session.add(new_user)
             db.session.add(new_user_info)

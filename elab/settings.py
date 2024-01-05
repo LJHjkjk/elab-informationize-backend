@@ -1,4 +1,11 @@
 import os
+import json
+
+def read_site_info(json_file_path):
+    with open(json_file_path, 'r') as file:
+        data = json.load(file)
+    return data
+
 
 class BaseConfig:
     # file
@@ -7,6 +14,8 @@ class BaseConfig:
 
     # elab
     ADMIN_PASSWARD='123132'
+    SITE_INFO=read_site_info('site_info.json')
+
 
     # flask-oidc
     OIDC_CLIENT_SECRETS = 'oidc_client_secrets.json'

@@ -8,8 +8,8 @@ class MailCenter(db.Model):
     # 邮件id
     id=db.Column(db.Integer,primary_key=True)
     title=db.Column(db.String(100),nullable=False)
-    sender_id=db.Column(db.String(30),nullable=False,default=0)
-    sender_name=db.Column(db.String(30),nullable=False,default='系统通知')
+    sender_id=db.Column(db.String(100),nullable=False,default=0)
+    sender_name=db.Column(db.String(100),nullable=False,default='系统通知')
     pubdate=db.Column(db.DateTime, default=datetime.now())
     receivers_id=db.Column(db.JSON,nullable=False)
     body=db.Column(db.Text)
@@ -78,6 +78,10 @@ class UserMailbox(db.Model):
         json_data.append(new_mail.id)
         self.send_history=json.dumps(json_data)
         db.session.commit()
+
+    def have_unfinished_mail(self):
+        unfinished_mailbox=json.loads(self.unfinished_mailbox)
+        return len(unfinished_mailbox)!=0
     
     
     @classmethod
@@ -96,8 +100,6 @@ def init_mail():
     db.metadata.create_all(bind=db.engine, tables=[MailCenter.__table__,UserMailbox.__table__])
 
 
-
-
 def drop_mail():
     # 删除两个表
     try:
@@ -105,8 +107,6 @@ def drop_mail():
         db.session.commit()
     except Exception as e:
         print(e)
-
-
 
 
 def forge_mail():

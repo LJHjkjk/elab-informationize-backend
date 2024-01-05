@@ -118,11 +118,11 @@ def register_commands(app):
             'material_directory':import_materail_from_directory
         }
         if type=='all':
-            fun_map['user']()
-            fun_map['duty']()
-            fun_map['position']()
-            fun_map['user_position']()
-            fun_map['material_directory']()
+            fun_map['user'](path)
+            fun_map['duty'](path)
+            fun_map['position'](path)
+            fun_map['user_position'](path)
+            fun_map['material_directory'](path)
             return
         fun_map[type](path)
 

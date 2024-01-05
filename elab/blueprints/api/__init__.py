@@ -10,13 +10,13 @@ from .auth import auth_init
 from .user import user_init
 from .mail import mail_init
 from .service import service_init
-
+from .site import site_init
 
 auth_init(api_blueprint)
 user_init(api_blueprint)
 mail_init(api_blueprint)
 service_init(api_blueprint)
-
+site_init(api_blueprint)
 
 
 from urllib.parse import urlencode

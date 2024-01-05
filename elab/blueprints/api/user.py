@@ -5,6 +5,8 @@ from elab.db.file import File,FileType
 from datetime import datetime
 from elab.response import response_data,response_message
 from elab.file_manage import avatars,photographs
+from elab.db.mail import UserMailbox
+
 
 user_blueprint=Blueprint('user',__name__)
 
@@ -25,11 +27,7 @@ def get_user_info():
 
 	if user:
 		# 返回用户信息
-		return jsonify({
-			'result':'ok',
-			'message':user.return_to_dict(),
-			'permission':{}
-		})
+		return response_data(user.return_to_dict())
 	else :
 		return jsonify({
 				'result':'no',
@@ -204,6 +202,30 @@ def get_members():
 	user_id=oidc.user_getfield('name')
 	# 返回数据
 	return response_data([i.return_to_dict() for i in UserView.query.all()])
+
+
+# 获取个人的其他信息,是否有邮件未做，是否有待办事件,用户权限等
+@user_blueprint.route('/extended-info')
+@oidc.require_login
+def get_user_extended_info():
+	user_id=oidc.user_getfield('name')
+	data={
+		'have_unfinished_mail':False,
+		'have_unfinished_matter':False,
+		'permission':['view_admin_panel','initiate_sign_in'],
+	}
+	# 是否有未完成邮件
+	user_mailbox=UserMailbox.query.get(user_id)
+	data['have_unfinished_mail']=user_mailbox.have_unfinished_mail()
+	# 是否有未完成事项
+	
+	# 权限
+	return response_data(data)
+
+
+
+
+
 
 
 def user_init(api_blueprint):
