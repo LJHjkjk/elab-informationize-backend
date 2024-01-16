@@ -4,7 +4,7 @@ from elab.extensions import oidc
 from elab.db.mail import MailCenter,UserMailbox
 from elab.db.user import UserView
 from elab.extensions import sqlAlchemy as db
-
+from elab.response import response_data,response_message
 import json
 
 mail_blueprint=Blueprint('mail',__name__)
@@ -165,7 +165,7 @@ def get_sendable_objects():
                 'department':user.department,
                 'grade':user.grade
             })
-    return jsonify(result)
+    return response_data(result)
 
 
 def mail_init(api_blueprint):

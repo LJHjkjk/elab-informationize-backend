@@ -19,6 +19,8 @@ faker = "*"
 flask-uploads = "==0.2.1"
 pandas = "*"
 openpyxl = "*"
+requests = "*"
+gunicorn = "*"
 
 [dev-packages]
 

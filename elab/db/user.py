@@ -1,7 +1,7 @@
 from elab.db import sqlAlchemy as db
 from .permission import *
 from faker import Faker
-
+from flask import current_app
 # casdoor的用户表
 class User(db.Model):
     __tablename__='user'
@@ -203,7 +203,7 @@ def forge_user():
     try:
         new_user=User(
             name='20221071164',
-            owner='built-in',
+            owner=current_app.config['OWNER_NAME'],
             avatar='https://img2.baidu.com/it/u=496494351,3684413482&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500',
             password='123123',
             id='1',
@@ -230,7 +230,7 @@ def forge_user():
             name=fake.name()
             new_user=User(
                 name=str(fake.ssn(min_age=11, max_age=11)),
-                owner='built-in',
+                owner=current_app.config['OWNER_NAME'],
                 avatar='https://img2.baidu.com/it/u=496494351,3684413482&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500',
                 password='123123',
                 id=str(i+2),

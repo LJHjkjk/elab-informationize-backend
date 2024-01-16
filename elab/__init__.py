@@ -5,7 +5,6 @@
 from flask import Flask,request,abort
 import os
 
-
 from elab.extensions import oidc,cors,sqlAlchemy,file_manage
 from elab.blueprints import blueprint
 
@@ -137,7 +136,3 @@ def register_requesthandlers(app):
     @app.before_first_request
     def before_first_request():
         file_manage.set_access()
-
-
-
-

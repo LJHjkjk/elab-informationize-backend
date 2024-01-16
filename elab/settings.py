@@ -44,13 +44,13 @@ class ProductionConfig(BaseConfig):
     SECRET_KEY= os.environ.get('SECRET_KEY')
     OWNER_NAME=os.environ.get('OWNER_NAME')
     # flask-sqlalchemy
-    SQLALCHEMY_DATABASE_URI=f'mysql+pymysql://root:{os.environ.get("DB_PASSWARD")}@localhost/casdoor'
+    SQLALCHEMY_DATABASE_URI=f'mysql+pymysql://root:{os.environ.get("DB_PASSWARD")}@{os.environ.get("DB_ADDRESS")}/casdoor'
     # oidc
-    OVERWRITE_REDIRECT_URI = "http://"+os.environ.get('HOST_ADDRESS')+"/oidc_callback"
+    OVERWRITE_REDIRECT_URI = "http://"+os.environ.get('CASDOOR_ADDRESS')+"/oidc_callback"
 
 
 Config={
-    'development':DevelopmentConfig,
+    'development':ProductionConfig,
     'production': ProductionConfig,
 }
 

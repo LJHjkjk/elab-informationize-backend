@@ -2,7 +2,7 @@ from flask import jsonify
 
 
 
-def response_message(message,result='no',code=400):
+def response_message(message,result='no',code=404):
     return jsonify({
         'result':result,
         'message':message
