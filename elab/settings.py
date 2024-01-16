@@ -14,11 +14,9 @@ class BaseConfig:
 
     # elab
     ADMIN_PASSWARD='123132'
-    SITE_INFO=read_site_info('site_info.json')
 
 
     # flask-oidc
-    OIDC_CLIENT_SECRETS = 'oidc_client_secrets.json'
     OIDC_SCOPES = ['openid', 'email', 'profile']
     OIDC_ID_TOKEN_COOKIE_TTL=600000
     OIDC_COOKIE_SECURE=False
@@ -31,6 +29,8 @@ class DevelopmentConfig(BaseConfig):
     OWNER_NAME='built-in'
     HOST_ADDRESS='localhost:5000'
     ROOT_URL='http://'+HOST_ADDRESS
+    SITE_INFO=read_site_info('site_info.json')
+
 
     # flask-sqlalchemy
     SQLALCHEMY_DATABASE_URI='mysql+pymysql://root:123123@localhost/casdoor'
@@ -43,11 +43,13 @@ class ProductionConfig(BaseConfig):
     FRONT_INDEX_URL=value = os.environ.get('FRONT_INDEX_URL')
     SECRET_KEY= os.environ.get('SECRET_KEY')
     OWNER_NAME=os.environ.get('OWNER_NAME')
+    SITE_INFO=os.environ.get('SITE_INFO')
+
     # flask-sqlalchemy
     SQLALCHEMY_DATABASE_URI=f'mysql+pymysql://root:{os.environ.get("DB_PASSWARD")}@{os.environ.get("DB_ADDRESS")}/casdoor'
     # oidc
     OVERWRITE_REDIRECT_URI = "http://"+os.environ.get('CASDOOR_ADDRESS')+"/oidc_callback"
-
+    OIDC_CLIENT_SECRETS = os.environ.get('OIDC_CLIENT_SECRETS')
 
 Config={
     'development':ProductionConfig,

@@ -14,13 +14,18 @@ import click
 from flask_uploads import configure_uploads
 from elab.import_data import import_user_info,import_user_position,import_positon_info,import_duty_info,\
 import_material_info_from_directory,import_material_info
+from dotenv import load_dotenv
 
-def create_app(config_name=None):
+def create_app(config_name=None,env_adress=None):
     '''
     工厂函数
     flask run会自动调用这个函数 
     '''
-
+    # 加载环境变量
+    if env_adress:
+        load_dotenv(env_adress)
+    else:
+        load_dotenv()
 
     # 根据运行模式加载配置
     if config_name is None:

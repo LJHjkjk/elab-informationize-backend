@@ -1,4 +1,6 @@
 fronten
 .env
+.flaskenv
 Pipfile.lock
 oidc_client_secrets.json
+site_info.json
