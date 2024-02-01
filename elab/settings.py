@@ -38,7 +38,7 @@ class DevelopmentConfig(BaseConfig):
 
 class ProductionConfig(BaseConfig):
     # elab
-    HOST_ADDRESS=os.environ.get('HOST_ADRRESS')
+    HOST_ADDRESS=os.environ.get('HOST_ADDRESS')
     ROOT_URL=f'http://{HOST_ADDRESS}'
     FRONT_INDEX_URL=value = os.environ.get('FRONT_INDEX_URL')
     SECRET_KEY= os.environ.get('SECRET_KEY')
@@ -48,7 +48,7 @@ class ProductionConfig(BaseConfig):
     # flask-sqlalchemy
     SQLALCHEMY_DATABASE_URI=f'mysql+pymysql://root:{os.environ.get("DB_PASSWARD")}@{os.environ.get("DB_ADDRESS")}/casdoor'
     # oidc
-    OVERWRITE_REDIRECT_URI = "http://"+os.environ.get('CASDOOR_ADDRESS')+"/oidc_callback"
+    OVERWRITE_REDIRECT_URI = "http://"+os.environ.get('HOST_ADDRESS')+"/oidc_callback"
     OIDC_CLIENT_SECRETS = os.environ.get('OIDC_CLIENT_SECRETS')
 
 Config={

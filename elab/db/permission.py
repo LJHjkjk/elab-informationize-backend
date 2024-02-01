@@ -37,9 +37,6 @@ class Positon(db.Model):
             'displayname':self.displayname,
             'describe':self.describe,
         }
-            
-
-    
 
 # 职责
 class Duty(db.Model):
@@ -75,4 +72,6 @@ def drop_permission():
     db.session.commit()
 
 def forge_permission():
-    pass
+    member_duty_map=MemberDutyMap(member_id=20221071164,duty='initiate_signin')
+    db.session.add(member_duty_map)
+    db.session.commit()

@@ -16,7 +16,7 @@ def check_permission(duty, resp=None):
             # 找到请求人
             user_id = oidc.user_getfield('name')
             # 验证是否有权限
-            check = MemberDutyMap.query.filter_by(member_id=user_id, duty=duty).first()
+            check = MemberDutyMap.query.filter_by(member_id=user_id, duty=duty).one()
             if check is None:
                 return resp
             else:

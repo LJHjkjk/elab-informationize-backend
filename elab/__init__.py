@@ -7,7 +7,7 @@ import os
 
 from elab.extensions import oidc,cors,sqlAlchemy,file_manage
 from elab.blueprints import blueprint
-
+from elab.service import sign_in_service
 from elab.settings import Config
 from elab.db import init_db,drop_db,forge_db
 import click
@@ -39,6 +39,8 @@ def create_app(config_name=None,env_adress=None):
     register_blueprints(app)
     register_commands(app)
     register_requesthandlers(app)
+
+    sign_in_service.set_app(app)
 
     return app
 
@@ -141,3 +143,6 @@ def register_requesthandlers(app):
     @app.before_first_request
     def before_first_request():
         file_manage.set_access()
+        sign_in_service.start()
+
+
